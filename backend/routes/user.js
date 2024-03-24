@@ -1,6 +1,6 @@
 const express = require('express');
 const { z } = require('zod');
-const { userModel } = require('../db');
+const { userModel, Account } = require('../db');
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
 
@@ -9,14 +9,17 @@ const authMiddleware = require('../middleware')
 const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET;
+const SALT = 10;
 
+
+// Signup Body Validation
 const signupBody = z.object({
     username: z.string({
         required_error: "Username is required",
         invalid_type_error: "Username must be a string",
-    }).min(3).trim(),
-    firstName: z.string(),
-    lastName: z.string(),
+    }).min(3).trim().toLowerCase(),
+    firstName: z.string().toLowerCase(),
+    lastName: z.string().toLowerCase(),
     password: z.string({
         required_error: "Password is required",
         invalid_type_error: "Password must be a string",
@@ -38,9 +41,15 @@ router.post('/signup', async (req, res) => {
             try {
                 const user = await userModel.create({
                     ...User.data,
-                    password: await bcrypt.hash(User.data.password, 10),
+                    password: await bcrypt.hash(User.data.password, SALT),
+
                 });
                 const userId = user._id;
+
+                await Account.create({
+                    userId,
+                    balance: 1 + Math.random() * 10000
+                })
 
                 const token = jwt.sign({ userId }, JWT_SECRET)
 
@@ -65,12 +74,12 @@ router.post('/signup', async (req, res) => {
 });
 
 
-
+// Login Body Validation
 const loginBody = z.object({
     username: z.string({
         required_error: "Username is required",
         invalid_type_error: "Username must be a string",
-    }).min(3).trim(),
+    }).min(3).trim().toLowerCase(),
     password: z.string({
         required_error: "Password is required",
         invalid_type_error: "Password must be a string",
@@ -78,9 +87,9 @@ const loginBody = z.object({
         { message: "Password must be longer than 4 Characters!" }),
 })
 
-router.post('/login', authMiddleware, async (req, res) => {
+router.post('/login', async (req, res) => {
     const body = req.body;
-
+    // console.log(req)
     const User = loginBody.safeParse(body)
 
     if (User.success) {
@@ -94,7 +103,7 @@ router.post('/login', authMiddleware, async (req, res) => {
         if (passCheck) {
 
             // * Need to convert the _id from the findOne() to string before passing it to jwt.sign
-            const token = jwt.sign(existingUser._id.toString(), JWT_SECRET);
+            const token = jwt.sign({ userId: existingUser._id.toString() }, JWT_SECRET);
             return res.status(200).json({ message: "Logged in successfully!", token: token });
         }
 
@@ -104,5 +113,86 @@ router.post('/login', authMiddleware, async (req, res) => {
         res.status(400).send(User.error.format());
     }
 })
+
+
+// Update User Body Validation
+const updateUserBody = z.object({
+    password: z.string({
+        required_error: "Password is required",
+        invalid_type_error: "Password must be a string",
+    }).min(3).trim(),
+    firstName: z.string(),
+    lastName: z.string(),
+}).partial();
+
+router.put('/', authMiddleware, async (req, res) => {
+    try {
+        const User = updateUserBody.safeParse(req.body)
+        if (!User.success) {
+            return res.status(411).send(User.error.format());
+        }
+
+        if (User.data.password) {
+            // Hash the password
+            User.data.password = await bcrypt.hash(User.data.password, SALT);
+        }
+
+        const updatedUser = await userModel.updateOne({ _id: req.userId }, User.data)
+
+        console.log(updatedUser)
+        res.status(200).json({ message: 'Successfully Updated!' })
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Server Error" });
+    }
+})
+
+
+
+
+router.get('/bulk', async (req, res) => {
+    try {
+        // Query Schema
+        const querySchema = z.string({
+            required_error: "Query parameter missing from request URL.",
+            invalid_type_error: "Query must be a string"
+        }).min(1, {
+            message: "Query is empty!"
+        }).trim().toLowerCase();
+
+        // Validate Schema
+        const query = querySchema.safeParse(req.query.filter);
+
+        if (!query.success) {
+            return res.status(400).send(query.error.format());
+        }
+
+        console.log(query.data)
+
+        const filter = new RegExp("^" + query.data, "i");
+        let users = await userModel.find({
+            $or: [
+                { firstName: { $regex: filter } },
+                { lastName: { $regex: filter } }
+            ]
+        })
+
+        console.log(users)
+
+        res.status(200).json({
+            users: users.map(user => ({
+                username: user.username,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                _id: user._id.toString()
+            }))
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+})
+
 
 module.exports = router;

@@ -15,10 +15,40 @@ const userSchema = new mongoose.Schema({
         required: true,
         minLength: 4
     },
-    firstName: String,
-    lastName: String,
+    firstName: {
+        type: String,
+        required: true,
+        trim: true,
+        maxLength: 100
+    },
+    lastName: {
+        type: String,
+        required: true,
+        trim: true,
+        maxLength: 100
+    },
+    account: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Account'
+    }
 });
 
-const userModel = mongoose.model('User', userSchema)
 
-module.exports = { userModel };
+const accountSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+    },
+    balance: {
+        type: Number,
+        default: 0,
+        required: true,
+    }
+})
+
+const userModel = mongoose.model('User', userSchema)
+const Account = mongoose.model('Account', accountSchema)
+
+
+module.exports = { userModel, Account };
