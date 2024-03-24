@@ -4,6 +4,8 @@ const { userModel } = require('../db');
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
 
+const authMiddleware = require('../middleware')
+
 const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -76,7 +78,7 @@ const loginBody = z.object({
         { message: "Password must be longer than 4 Characters!" }),
 })
 
-router.post('/login', async (req, res) => {
+router.post('/login', authMiddleware, async (req, res) => {
     const body = req.body;
 
     const User = loginBody.safeParse(body)
