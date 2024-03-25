@@ -7,7 +7,7 @@ const authMiddleware = async (req, res, next) => {
         if (authHeader || !authHeader.startsWith('Bearer ')) {
             try {
                 const decoded = await jwt.verify(authHeader.split(' ')[1], JWT_SECRET);
-                console.log("------", decoded)
+                console.log("Auth Decoded: ", decoded)
                 req.userId = decoded.userId;
                 next();
             } catch (error) {

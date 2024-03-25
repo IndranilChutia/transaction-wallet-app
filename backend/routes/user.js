@@ -103,7 +103,8 @@ router.post('/login', async (req, res) => {
         if (passCheck) {
 
             // * Need to convert the _id from the findOne() to string before passing it to jwt.sign
-            const token = jwt.sign({ userId: existingUser._id.toString() }, JWT_SECRET);
+            const userId = existingUser._id;
+            const token = jwt.sign({ userId }, JWT_SECRET);
             return res.status(200).json({ message: "Logged in successfully!", token: token });
         }
 
@@ -132,6 +133,7 @@ router.put('/', authMiddleware, async (req, res) => {
             return res.status(411).send(User.error.format());
         }
 
+        // If password is provided in body hash it
         if (User.data.password) {
             // Hash the password
             User.data.password = await bcrypt.hash(User.data.password, SALT);
