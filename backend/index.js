@@ -18,6 +18,10 @@ app.get("/", (req, res) => {
 
 app.use('/api/v1', mainRouter);
 
+app.get('*', function (req, res) {
+    res.status(404).json({ message: "Route Not Found!" });
+});
+
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`)
