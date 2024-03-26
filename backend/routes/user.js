@@ -63,7 +63,7 @@ router.post('/signup', async (req, res) => {
                 res.status(500).send(error)
             }
         } else {
-            res.status(411).json({
+            res.status(400).json({
                 message: "User already exists"
             })
         }
@@ -126,7 +126,7 @@ const updateUserBody = z.object({
     lastName: z.string(),
 }).partial();
 
-router.put('/', authMiddleware, async (req, res) => {
+router.put('/updateUser', authMiddleware, async (req, res) => {
     try {
         const User = updateUserBody.safeParse(req.body)
         if (!User.success) {
