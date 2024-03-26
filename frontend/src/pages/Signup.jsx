@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 
 const BASE_URL = import.meta.env.VITE_BASE_URL
-console.log(BASE_URL)
 
 // ShadCn Imports
 import { Button } from "@/components/ui/button"
@@ -70,8 +69,8 @@ const Signup = () => {
         localStorage.setItem('token', res.data.token);
         navigate('/dashboard')
       } else {
-        alert("Login Failed")
-        throw new Error("Login Failed")
+        alert("Registration Failed")
+        throw new Error("Registration Failed")
       }
 
     } catch (error) {
