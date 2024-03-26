@@ -159,8 +159,6 @@ router.get('/bulk', async (req, res) => {
         const querySchema = z.string({
             required_error: "Query parameter missing from request URL.",
             invalid_type_error: "Query must be a string"
-        }).min(1, {
-            message: "Query is empty!"
         }).trim().toLowerCase();
 
         // Validate Schema
