@@ -87,7 +87,7 @@ const loginBody = z.object({
         { message: "Password must be longer than 4 Characters!" }),
 })
 
-router.post('/login', async (req, res) => {
+router.post('/signin', async (req, res) => {
     const body = req.body;
     // console.log(req)
     const User = loginBody.safeParse(body)
