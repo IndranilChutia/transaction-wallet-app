@@ -1,6 +1,10 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from './avatar';
+import { Avatar, AvatarFallback } from './ui/avatar';
+import { Input } from '@/components/ui/input';
+
+import SendMoneyDialog from './SendMoneyDialog';
+
 
 const UserCard = ({ id, firstName, lastName, username }) => {
 
@@ -29,9 +33,7 @@ const UserCard = ({ id, firstName, lastName, username }) => {
                 </div>
             </div>
             <div>
-                <Button>
-                    Send Money
-                </Button>
+                <SendMoneyDialog id={id} firstName={firstName} lastName={lastName} username={username} />
             </div>
         </div>
     );

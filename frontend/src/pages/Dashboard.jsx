@@ -1,9 +1,10 @@
-import Navbar from '@/components/ui/Navbar';
+import Navbar from '@/components/Navbar';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Input } from '@/components/ui/input';
 import _ from 'lodash';
-import UserCard from '@/components/ui/UserCard';
+import UserCard from '@/components/UserCard';
+import { Button } from '@/components/ui/button';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const Dashboard = () => {
@@ -44,12 +45,20 @@ const Dashboard = () => {
         fetch();
     }, [search])
 
+    const logout = () => {
+        localStorage.removeItem('token');
+        window.location.reload()
+    }
+
 
     return (
         <div>
             <Navbar />
             <div className='px-12 py-6'>
-                <h2 className='text-xl font-medium'>Your Balance: ₹{balance}</h2>
+                <div className='flex w-full justify-between items-center'>
+                    <h2 className='text-xl font-medium'>Your Balance: ₹{balance}</h2>
+                    <Button variant="secondary" onClick={logout}>Log Out</Button>
+                </div>
                 <h2 className='mt-8 font-medium'>Search Users</h2>
                 <Input className="mt-2" placeholder="Enter First or Last Name..." onChange={debounceFetchUsers} />
 
