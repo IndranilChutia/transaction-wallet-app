@@ -79,7 +79,7 @@ const Signin = () => {
     return (
         <div className='flex min-h-screen flex-col items-center justify-center'>
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-xs w-full flex flex-col gap-4 border p-4 rounded-lg border-slate-100">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-xs w-full flex flex-col gap-4 border p-4 rounded-lg border-slate-200">
                     <div className='w-full flex flex-col items-center'>
                         <h1 className='text-2xl font-bold'>Sign In</h1>
                         <p className='text-center text-xs text-gray-500 my-1.5'>Enter your credentials to access your account</p>
