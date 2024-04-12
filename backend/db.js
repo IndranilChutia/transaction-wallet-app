@@ -23,13 +23,8 @@ const userSchema = new mongoose.Schema({
     },
     lastName: {
         type: String,
-        required: true,
         trim: true,
         maxLength: 100
-    },
-    account: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Account'
     }
 });
 

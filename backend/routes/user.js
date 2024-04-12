@@ -19,7 +19,7 @@ const signupBody = z.object({
         invalid_type_error: "Username must be a string",
     }).min(3).trim().toLowerCase(),
     firstName: z.string().toLowerCase(),
-    lastName: z.string().toLowerCase(),
+    lastName: z.string().toLowerCase().optional(),
     password: z.string({
         required_error: "Password is required",
         invalid_type_error: "Password must be a string",
